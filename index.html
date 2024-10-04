@@ -13,30 +13,39 @@
         <button type="submit">Sign and Install</button>
     </form>
 
+    <div id="feedback" style="margin-top: 20px;"></div>
+
     <script>
         const form = document.getElementById('upload-form');
+        const feedbackDiv = document.getElementById('feedback');
         const baseUrl = 'https://2d80f1eb-d228-43ee-a76d-97fafa7e2e80-00-qmzb144eqw8t.janeway.replit.dev'; // Your Replit dev URL
 
         form.addEventListener('submit', (event) => {
             event.preventDefault();
+            feedbackDiv.innerText = 'Processing...';
             const formData = new FormData(form);
             
             fetch(`${baseUrl}/sign-and-install`, {
                 method: 'POST',
                 body: formData,
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
-                    alert('Signing successful! You can download the app.');
+                    feedbackDiv.innerText = 'Signing successful! You can download the app.';
                     window.location.href = `itms-services://?action=download-manifest&url=${data.plist_url}`;
                 } else {
-                    alert(`Error: ${data.error}`);
+                    feedbackDiv.innerText = `Error: ${data.error}`;
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('An error occurred while signing the IPA.');
+                feedbackDiv.innerText = 'An error occurred while signing the IPA: ' + error.message;
             });
         });
     </script>
