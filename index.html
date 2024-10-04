@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IPA and Certificate Signer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        input[type="file"] {
+            display: block;
+            margin-bottom: 15px;
+        }
+        input[type="submit"] {
+            background-color: #28a745;
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <h1>IPA and Certificate Signer</h1>
+    <form action="https://2d80f1eb-d228-43ee-a76d-97fafa7e2e80-00-qmzb144eqw8t.janeway.replit.dev/upload" method="post" enctype="multipart/form-data">
+        <label for="ipa">Select IPA File:</label>
+        <input type="file" id="ipa" name="ipa" accept=".ipa" required><br>
+
+        <label for="cert">Select Certificate File:</label>
+        <input type="file" id="cert" name="cert" accept=".cer" required><br>
+
+        <input type="submit" value="Sign IPA">
+    </form>
+</body>
+</html>
