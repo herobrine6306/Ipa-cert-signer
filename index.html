@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IPA Cert Signer</title>
+    <script type="module" src="helper.js"></script>
 </head>
 <body>
     <h1>IPA Certificate Signer</h1>
@@ -15,40 +16,29 @@
 
     <div id="feedback" style="margin-top: 20px;"></div>
 
-    <script>
-        const form = document.getElementById('upload-form');
-        const feedbackDiv = document.getElementById('feedback');
-        const baseUrl = 'https://2d80f1eb-d228-43ee-a76d-97fafa7e2e80-00-qmzb144eqw8t.janeway.replit.dev'; // Your Replit dev URL
+    <script type="module">
+        import { signAndInstall, updateFeedback } from './helper.js';
 
-        form.addEventListener('submit', (event) => {
+        const form = document.getElementById('upload-form');
+
+        form.addEventListener('submit', async (event) => {
             event.preventDefault();
-            feedbackDiv.innerText = 'Processing...';
-            const formData = new FormData(form);
-            
-            fetch(`${baseUrl}/sign-and-install`, {
-                method: 'POST',
-                body: formData,
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
+            updateFeedback('Processing...');
+            const ipaFile = document.getElementById('ipa').files[0];
+            const certFile = document.getElementById('cert').files[0];
+
+            try {
+                const data = await signAndInstall(ipaFile, certFile);
                 if (data.success) {
-                    feedbackDiv.innerText = 'Signing successful! You can download the app.';
+                    updateFeedback('Signing successful! You can download the app.');
                     window.location.href = `itms-services://?action=download-manifest&url=${data.plist_url}`;
                 } else {
-                    feedbackDiv.innerText = `Error: ${data.error}`;
+                    updateFeedback(`Error: ${data.error}`);
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                feedbackDiv.innerText = 'An error occurred while signing the IPA: ' + error.message;
-            });
+            } catch (error) {
+                updateFeedback('An error occurred while signing the IPA: ' + error.message);
+            }
         });
     </script>
 </body>
 </html>
-
