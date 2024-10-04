@@ -1,43 +1,45 @@
-<form id="uploadForm" enctype="multipart/form-data">
-    <label for="ipa">Upload IPA File:</label>
-    <input type="file" id="ipa" name="ipa" accept=".ipa" required>
-    
-    <label for="cert">Upload Signing Certificate (.p12 or .pem):</label>
-    <input type="file" id="cert" name="cert" accept=".p12,.pem" required>
-    
-    <button type="submit">Sign & Install</button>
-</form>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IPA Cert Signer</title>
+</head>
+<body>
+    <h1>IPA Certificate Signer</h1>
+    <form id="upload-form">
+        <input type="file" id="ipa" name="ipa" accept=".ipa" required>
+        <input type="file" id="cert" name="cert" accept=".p12,.cer" required>
+        <button type="submit">Sign and Install</button>
+    </form>
 
-<script>
-document.getElementById('uploadForm').onsubmit = async function (e) {
-    e.preventDefault();
-    
-    const ipaFile = document.getElementById('ipa').files[0];
-    const certFile = document.getElementById('cert').files[0];
-    
-    if (!ipaFile || !certFile) {
-        alert('Please upload both an IPA file and a signing certificate.');
-        return;
-    }
-    
-    // Upload IPA and certificate files to the server for signing
-    const formData = new FormData();
-    formData.append('ipa', ipaFile);
-    formData.append('cert', certFile);
-    
-    // Send files to the backend
-    const response = await fetch('/sign-and-install', {
-        method: 'POST',
-        body: formData
-    });
+    <script>
+        const form = document.getElementById('upload-form');
+        const baseUrl = 'https://2d80f1eb-d228-43ee-a76d-97fafa7e2e80-00-qmzb144eqw8t.janeway.replit.dev'; // Your Replit dev URL
 
-    const result = await response.json();
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const formData = new FormData(form);
+            
+            fetch(`${baseUrl}/sign-and-install`, {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Signing successful! You can download the app.');
+                    window.location.href = `itms-services://?action=download-manifest&url=${data.plist_url}`;
+                } else {
+                    alert(`Error: ${data.error}`);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while signing the IPA.');
+            });
+        });
+    </script>
+</body>
+</html>
 
-    if (result.success) {
-        // This triggers the installation prompt
-        window.location.href = `itms-services://?action=download-manifest&url=${result.plist_url}`;
-    } else {
-        alert('Signing failed. Please check the certificate or try again.');
-    }
-};
-</script>
